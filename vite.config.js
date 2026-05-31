@@ -18,4 +18,8 @@ function copyAssetFolder() {
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), copyAssetFolder()],
+  preview: {
+    host: '0.0.0.0',
+    allowedHosts: true,
+  },
 });
