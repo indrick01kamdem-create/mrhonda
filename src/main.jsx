@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import './styles.css';
 
-const WA_NUMBER = '237692617975';
+const WA_NUMBER = '237693271126';
 const START_DATE = '7 septembre 2026';
 
 const programs = [
