@@ -213,6 +213,8 @@ function HomePage({ onRegister }) {
         </div>
       </section>
 
+      <HondaKnowledgeCallout onRegister={onRegister} />
+
       <section id="diagnostic" className="diagnostic-panel section">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 sm:px-8 lg:grid-cols-2">
           <div className="obd-visual grid place-items-center p-6">
@@ -308,20 +310,23 @@ function RegisterPage({ onHome }) {
       return;
     }
 
+    const filled = (value) => value?.trim() || 'Non renseigné';
     const lines = [
       "Bonjour MR HONDA, je souhaite m'inscrire à la formation.",
       '',
-      `Nom : ${values.nom}`,
-      `WhatsApp : ${values.whatsapp}`,
-      values.age && `Âge : ${values.age}`,
-      `Localisation : ${[values.quartier, values.ville].filter(Boolean).join(', ')}`,
-      `Niveau scolaire : ${values.niveau}`,
-      `Expérience : ${values.experience}`,
-      `Filière souhaitée : ${values.filiere}`,
-      `Objectif : ${values.objectif}`,
-      `Déjà travaillé en garage : ${values.garage || 'Non précisé'}`,
+      'DOSSIER D’INSCRIPTION',
+      `Nom et prénom : ${filled(values.nom)}`,
+      `Numéro WhatsApp : ${filled(values.whatsapp)}`,
+      `Âge : ${filled(values.age)}`,
+      `Quartier : ${filled(values.quartier)}`,
+      `Ville : ${filled(values.ville)}`,
+      `Niveau scolaire : ${filled(values.niveau)}`,
+      `Expérience en mécanique : ${filled(values.experience)}`,
+      `Filière souhaitée : ${filled(values.filiere)}`,
+      `Objectif : ${filled(values.objectif)}`,
+      `Déjà travaillé en garage : ${filled(values.garage)}`,
+      `Comment j’ai connu MR HONDA : ${filled(values.source)}`,
       `Début souhaité : ${START_DATE}`,
-      values.source && `Source : ${values.source}`,
     ].filter(Boolean);
 
     window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
@@ -432,6 +437,48 @@ function SectionIntro({ eyebrow, title, text }) {
       </div>
       <p className="max-w-xl font-['Archivo'] text-base font-semibold leading-7 text-neutral-700 sm:text-lg">{text}</p>
     </div>
+  );
+}
+
+function HondaKnowledgeCallout({ onRegister }) {
+  return (
+    <section className="border-y border-neutral-200 bg-neutral-950 py-20 text-white">
+      <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 sm:px-8 lg:grid-cols-[1.15fr_.85fr]">
+        <div>
+          <p className="b-eyebrow">Bases Honda · Savoir d’atelier</p>
+          <h2 className="display mt-4 max-w-4xl text-5xl sm:text-7xl">
+            Des notions solides, transmises par des spécialistes Honda.
+          </h2>
+          <p className="mt-6 max-w-2xl font-['Archivo'] text-lg font-semibold leading-8 text-neutral-300">
+            En plus de la mécanique automobile générale, nous te transmettons les méthodes,
+            réflexes et notions techniques que nous avons développés sur les véhicules Honda.
+            Tu apprends à comprendre la panne, à raisonner proprement et à travailler comme un
+            vrai technicien d’atelier.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-4">
+            <button className="btn-skew p" onClick={onRegister}>
+              <span>Rejoindre la formation</span>
+            </button>
+            <a className="btn-skew bg-white text-neutral-950" href={`https://wa.me/${WA_NUMBER}`} target="_blank">
+              <span>Poser une question</span>
+            </a>
+          </div>
+        </div>
+        <div className="grid gap-3">
+          {[
+            ['01', 'Mécanique auto', 'Les bases utiles pour intervenir avec méthode.'],
+            ['02', 'Culture Honda', 'Des repères issus de notre spécialité terrain.'],
+            ['03', 'Pratique atelier', 'Des exercices concrets pour progresser vite.'],
+          ].map(([number, title, text]) => (
+            <div key={title} className="border border-white/10 bg-white/[.06] p-5">
+              <span className="display text-4xl text-red-500">{number}</span>
+              <h3 className="mt-3 font-['Archivo'] text-xl font-black uppercase">{title}</h3>
+              <p className="mt-2 font-['Archivo'] text-sm font-semibold leading-6 text-neutral-300">{text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -584,7 +631,7 @@ function Footer({ onRegister }) {
         </div>
         <div className="grid gap-2 text-sm font-semibold text-neutral-600">
           <a href={`https://wa.me/${WA_NUMBER}`} target="_blank" className="hover:text-red-700">
-            WhatsApp · +237 692 617 975
+            WhatsApp · +237 693 27 11 26
           </a>
           <span className="flex items-center gap-2">
             <MapPin className="h-4 w-4 text-red-700" />
