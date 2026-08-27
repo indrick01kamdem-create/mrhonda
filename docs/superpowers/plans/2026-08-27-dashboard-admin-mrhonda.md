@@ -24,6 +24,17 @@ commits vont dans le dépôt de la tâche : ne jamais mélanger les deux dans un
 
 ## Global Constraints
 
+> **Décision du 2026-08-27 : les tests automatisés sont suspendus.** Le partenaire humain a
+> demandé « pas besoin de test pour le moment ». Toutes les étapes d'écriture et
+> d'exécution de tests décrites dans les tâches ci-dessous sont donc **annulées**, ainsi que
+> l'ajout de `pytest` et `httpx` à `requirements.txt` (Task 1) et l'installation de `vitest`
+> (Task 8). Les fichiers `tests/*.py` et `src/**/*.test.js` ne sont pas écrits. Les
+> **vérifications manuelles** décrites dans les tâches restent en vigueur : ce sont elles
+> qui remplacent la couverture automatisée. Les blocs de code de test conservés dans ce
+> document servent de spécification lisible du comportement attendu, à réactiver si les
+> tests sont réintroduits plus tard.
+
+
 - **Le site generalpolstermoebel tourne en production.** Le seul fichier existant du BACKEND
   qui peut être modifié est `app/main.py`, et uniquement pour y ajouter trois lignes
   (Task 6). Aucune modification de `app/storage.py`, `app/default_content.py`, ni des
