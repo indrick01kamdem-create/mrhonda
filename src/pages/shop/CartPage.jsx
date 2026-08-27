@@ -1,24 +1,13 @@
+import { useState } from 'react';
 import { MessageCircle, Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
-import { WA_NUMBER } from '../../data/shop';
+import { CheckoutDialog } from '../../components/shop/CheckoutDialog';
 import { formatPrice } from '../../utils/format';
 
 export function CartPage({ cart, onAdd, onSubtract, onRemove }) {
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shipping = cart.length ? 2500 : 0;
   const total = subtotal + shipping;
-
-  const checkout = () => {
-    const lines = [
-      'Bonjour MR HONDA, je souhaite commander :',
-      '',
-      ...cart.map((item) => `- ${item.name} x${item.quantity} : ${formatPrice(item.price * item.quantity)}`),
-      '',
-      `Sous-total : ${formatPrice(subtotal)}`,
-      `Livraison estimée : ${formatPrice(shipping)}`,
-      `Total estimé : ${formatPrice(total)}`,
-    ];
-    window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
-  };
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   return (
     <main className="bg-[#f9f9f8]">
@@ -74,12 +63,20 @@ export function CartPage({ cart, onAdd, onSubtract, onRemove }) {
             <span className="font-['Archivo'] text-xl font-black uppercase">Total</span>
             <b className="font-['Archivo'] text-xl">{formatPrice(total)}</b>
           </div>
-          <button className="btn-whatsapp mt-6 h-14 w-full px-5" disabled={!cart.length} onClick={checkout}>
+          <button className="btn-whatsapp mt-6 h-14 w-full px-5" disabled={!cart.length} onClick={() => setCheckoutOpen(true)}>
             <MessageCircle className="h-5 w-5" />
             Commander sur WhatsApp
           </button>
         </aside>
       </section>
+      {checkoutOpen && (
+        <CheckoutDialog
+          cart={cart}
+          subtotal={subtotal}
+          shipping={shipping}
+          onClose={() => setCheckoutOpen(false)}
+        />
+      )}
     </main>
   );
 }
