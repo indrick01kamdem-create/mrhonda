@@ -40,7 +40,7 @@ export function fieldErrors(body) {
 export async function apiFetch(path, { method = 'GET', body, token, formData } = {}) {
   const headers = {};
   if (token) headers.Authorization = `Bearer ${token}`;
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  if (body !== undefined && !formData) headers['Content-Type'] = 'application/json';
 
   let response;
   try {

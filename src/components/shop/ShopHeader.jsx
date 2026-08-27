@@ -1,7 +1,7 @@
 import { Menu, Search, ShoppingCart, X } from 'lucide-react';
 import { WA_NUMBER } from '../../data/shop';
 
-export function ShopHeader({ cartCount, menuOpen, onToggleMenu }) {
+export function ShopHeader({ cartCount, menuOpen, onToggleMenu, categories = [] }) {
   return (
     <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/92 backdrop-blur-xl">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8">
@@ -17,15 +17,11 @@ export function ShopHeader({ cartCount, menuOpen, onToggleMenu }) {
           <a href="#" className="hover:text-red-700">
             Boutique
           </a>
-          <a href="#category/pieces-moteur" className="hover:text-red-700">
-            Pièces
-          </a>
-          <a href="#category/transmission" className="hover:text-red-700">
-            Transmission
-          </a>
-          <a href="#category/diagnostic" className="hover:text-red-700">
-            Diagnostic
-          </a>
+          {categories.slice(0, 3).map((category) => (
+            <a key={category.slug} href={`#category/${category.slug}`} className="hover:text-red-700">
+              {category.title}
+            </a>
+          ))}
           <a href="#formation" className="hover:text-red-700">
             Formation
           </a>

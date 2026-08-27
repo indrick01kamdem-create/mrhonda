@@ -84,7 +84,12 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#f9f9f8] text-neutral-950">
-      <ShopHeader cartCount={cartCount} menuOpen={menuOpen} onToggleMenu={() => setMenuOpen((value) => !value)} />
+      <ShopHeader
+        cartCount={cartCount}
+        menuOpen={menuOpen}
+        onToggleMenu={() => setMenuOpen((value) => !value)}
+        categories={categories}
+      />
       {error && route.page !== 'cart' ? (
         <main className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
           <ErrorState error={error} onRetry={reload} />
