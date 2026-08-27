@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { useCatalog } from './hooks/useCatalog';
 import { CatalogSkeleton } from './components/shop/CatalogSkeleton';
@@ -12,7 +12,16 @@ import { CartPage } from './pages/shop/CartPage';
 import { FormationSite } from './pages/formation/FormationSite';
 import './styles.css';
 
+const AdminApp = lazy(() => import('./pages/admin/AdminApp').then((m) => ({ default: m.AdminApp })));
+
+const ADMIN_PATH = '/admin/123rvf';
+
 function parseRoute() {
+  const path = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
+  if (path === ADMIN_PATH) {
+    return { site: 'admin', tab: window.location.hash.replace(/^#/, '') || 'produits' };
+  }
+
   const hash = window.location.hash.replace(/^#/, '');
 
   if (hash === 'formation') return { site: 'formation', page: 'home' };
@@ -29,27 +38,49 @@ function parseRoute() {
 }
 
 function App() {
-  const { loading, error, categories, products, reload } = useCatalog();
   const [route, setRoute] = useState(parseRoute);
+
+  useEffect(() => {
+    const syncRoute = () => setRoute(parseRoute());
+    window.addEventListener('hashchange', syncRoute);
+    window.addEventListener('popstate', syncRoute);
+    return () => {
+      window.removeEventListener('hashchange', syncRoute);
+      window.removeEventListener('popstate', syncRoute);
+    };
+  }, []);
+
+  if (route.site === 'admin') {
+    return (
+      <Suspense
+        fallback={
+          <div className="flex min-h-screen items-center justify-center font-['Archivo'] font-black uppercase">
+            Chargement du dashboard…
+          </div>
+        }
+      >
+        <AdminApp tab={route.tab} />
+      </Suspense>
+    );
+  }
+
+  if (route.site === 'formation') {
+    return <FormationSite initialPage={route.page} anchor={route.anchor} />;
+  }
+
+  return <ShopApp route={route} />;
+}
+
+function ShopApp({ route }) {
+  const { loading, error, categories, products, reload } = useCatalog();
   const [cart, setCart] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const syncRoute = () => {
-      const nextRoute = parseRoute();
-      setRoute(nextRoute);
-      setMenuOpen(false);
-      if (!nextRoute.anchor) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    };
-
-    window.addEventListener('hashchange', syncRoute);
-    return () => window.removeEventListener('hashchange', syncRoute);
-  }, []);
-
-  useEffect(() => {
-    if (route.anchor) {
+    setMenuOpen(false);
+    if (!route.anchor) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
       window.requestAnimationFrame(() => {
         document.getElementById(route.anchor)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
@@ -77,10 +108,6 @@ function App() {
   const cartCount = useMemo(() => cart.reduce((sum, item) => sum + item.quantity, 0), [cart]);
   const selectedProduct =
     route.page === 'product' ? products.find((product) => product.id === route.id) ?? null : null;
-
-  if (route.site === 'formation') {
-    return <FormationSite initialPage={route.page} anchor={route.anchor} />;
-  }
 
   return (
     <div className="min-h-screen bg-[#f9f9f8] text-neutral-950">
