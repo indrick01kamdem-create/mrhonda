@@ -1,7 +1,22 @@
 import { CheckCircle2, Star } from 'lucide-react';
 import { formatPrice } from '../../utils/format';
 
-export function ProductDetailPage({ product, onAdd }) {
+export function ProductDetailPage({ product, onAdd, loading }) {
+  if (loading) {
+    return (
+      <main className="mx-auto max-w-7xl px-5 py-20 sm:px-8">
+        <div className="grid gap-8 lg:grid-cols-12">
+          <div className="aspect-square animate-pulse bg-neutral-200 lg:col-span-7" />
+          <div className="space-y-4 lg:col-span-5">
+            <div className="h-4 w-1/4 animate-pulse bg-neutral-200" />
+            <div className="h-10 w-3/4 animate-pulse bg-neutral-200" />
+            <div className="h-8 w-1/3 animate-pulse bg-neutral-200" />
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   if (!product) {
     return (
       <main className="mx-auto max-w-7xl px-5 py-20 sm:px-8">

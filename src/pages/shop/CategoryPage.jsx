@@ -1,19 +1,11 @@
-import { categories, filters, products } from '../../data/shop';
 import { ProductCard } from '../../components/shop/ProductCard';
+import { buildFilters, filterProducts, findCategory } from '../../utils/catalog';
 
-const filterSlugs = {
-  'Pièces moteur': 'pieces-moteur',
-  Transmission: 'transmission',
-  Diagnostic: 'diagnostic',
-  Freinage: 'freinage',
-  Climatisation: 'climatisation',
-  Entretien: 'entretien',
-};
-
-export function CategoryPage({ slug, onAdd }) {
+export function CategoryPage({ slug, onAdd, products, categories }) {
   const activeSlug = slug || 'all';
-  const category = categories.find((item) => item.slug === activeSlug);
-  const visibleProducts = activeSlug === 'all' ? products : products.filter((product) => product.categorySlug === activeSlug);
+  const category = findCategory(categories, activeSlug);
+  const visibleProducts = filterProducts(products, activeSlug);
+  const filters = buildFilters(categories);
 
   return (
     <main className="bg-white">
@@ -30,25 +22,26 @@ export function CategoryPage({ slug, onAdd }) {
       <section className="section">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="mb-10 flex gap-3 overflow-x-auto pb-2">
-            <a className={`filter-chip ${activeSlug === 'all' ? 'is-active' : ''}`} href="#category/all">
-              Tout
-            </a>
-            {filters
-              .filter((item) => item !== 'Tout')
-              .map((item) => {
-                const itemSlug = filterSlugs[item];
-                return (
-                  <a key={item} className={`filter-chip ${activeSlug === itemSlug ? 'is-active' : ''}`} href={`#category/${itemSlug}`}>
-                    {item}
-                  </a>
-                );
-              })}
+            {filters.map((filter) => (
+              <a
+                key={filter.slug}
+                className={`filter-chip ${activeSlug === filter.slug ? 'is-active' : ''}`}
+                href={`#category/${filter.slug}`}
+              >
+                {filter.label}
+              </a>
+            ))}
           </div>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {visibleProducts.map((product) => (
               <ProductCard key={product.id} product={product} onAdd={onAdd} />
             ))}
           </div>
+          {visibleProducts.length === 0 && (
+            <p className="py-16 text-center font-semibold text-neutral-500">
+              Aucun produit dans cette catégorie pour le moment.
+            </p>
+          )}
         </div>
       </section>
     </main>

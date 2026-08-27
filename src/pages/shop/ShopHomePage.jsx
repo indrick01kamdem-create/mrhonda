@@ -1,12 +1,13 @@
 import { MessageCircle, ShieldCheck, Truck, Wrench } from 'lucide-react';
-import { categories, products, WA_NUMBER } from '../../data/shop';
+import { WA_NUMBER } from '../../data/shop';
 import { formatPrice } from '../../utils/format';
 import { CategoryCard } from '../../components/shop/CategoryCard';
 import { ProductCard } from '../../components/shop/ProductCard';
 import { ShopSectionIntro } from '../../components/shop/ShopSectionIntro';
 import { TrustCard } from '../../components/shop/TrustCard';
 
-export function ShopHomePage({ onAdd }) {
+export function ShopHomePage({ onAdd, products, categories }) {
+  const featured = products[0];
   return (
     <main>
       <section className="shop-hero">
@@ -37,14 +38,16 @@ export function ShopHomePage({ onAdd }) {
             </div>
           </div>
           <div className="hero-product-stage">
-            <a href={`#product/${products[0].id}`} className="hero-product-card">
-              <img src={products[0].image} alt="Valise diagnostic professionnelle" />
-              <div className="hero-product-info">
-                <span>Produit phare</span>
-                <b>{products[0].name}</b>
-                <strong>{formatPrice(products[0].price)}</strong>
-              </div>
-            </a>
+            {featured && (
+              <a href={`#product/${featured.id}`} className="hero-product-card">
+                <img src={featured.image} alt={featured.name} />
+                <div className="hero-product-info">
+                  <span>Produit phare</span>
+                  <b>{featured.name}</b>
+                  <strong>{formatPrice(featured.price)}</strong>
+                </div>
+              </a>
+            )}
           </div>
         </div>
       </section>

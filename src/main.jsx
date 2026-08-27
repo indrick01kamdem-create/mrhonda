@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { products } from './data/shop';
+import { useCatalog } from './hooks/useCatalog';
+import { CatalogSkeleton } from './components/shop/CatalogSkeleton';
+import { ErrorState } from './components/shop/ErrorState';
 import { ShopHeader } from './components/shop/ShopHeader';
 import { ShopFooter } from './components/shop/ShopFooter';
 import { ShopHomePage } from './pages/shop/ShopHomePage';
@@ -27,8 +29,9 @@ function parseRoute() {
 }
 
 function App() {
+  const { loading, error, categories, products, reload } = useCatalog();
   const [route, setRoute] = useState(parseRoute);
-  const [cart, setCart] = useState([{ ...products[0], quantity: 1 }]);
+  const [cart, setCart] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -72,7 +75,8 @@ function App() {
   };
 
   const cartCount = useMemo(() => cart.reduce((sum, item) => sum + item.quantity, 0), [cart]);
-  const selectedProduct = route.page === 'product' ? products.find((product) => product.id === route.id) : null;
+  const selectedProduct =
+    route.page === 'product' ? products.find((product) => product.id === route.id) ?? null : null;
 
   if (route.site === 'formation') {
     return <FormationSite initialPage={route.page} anchor={route.anchor} />;
@@ -81,16 +85,40 @@ function App() {
   return (
     <div className="min-h-screen bg-[#f9f9f8] text-neutral-950">
       <ShopHeader cartCount={cartCount} menuOpen={menuOpen} onToggleMenu={() => setMenuOpen((value) => !value)} />
-      {route.page === 'home' && <ShopHomePage onAdd={addToCart} />}
-      {route.page === 'category' && <CategoryPage slug={route.slug} onAdd={addToCart} />}
-      {route.page === 'product' && <ProductDetailPage product={selectedProduct} onAdd={addToCart} />}
-      {route.page === 'cart' && (
-        <CartPage
-          cart={cart}
-          onAdd={(id) => updateQuantity(id, 1)}
-          onSubtract={(id) => updateQuantity(id, -1)}
-          onRemove={removeFromCart}
-        />
+      {error && route.page !== 'cart' ? (
+        <main className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
+          <ErrorState error={error} onRetry={reload} />
+        </main>
+      ) : (
+        <>
+          {route.page === 'home' &&
+            (loading ? (
+              <main className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
+                <CatalogSkeleton />
+              </main>
+            ) : (
+              <ShopHomePage onAdd={addToCart} products={products} categories={categories} />
+            ))}
+          {route.page === 'category' &&
+            (loading ? (
+              <main className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
+                <CatalogSkeleton />
+              </main>
+            ) : (
+              <CategoryPage slug={route.slug} onAdd={addToCart} products={products} categories={categories} />
+            ))}
+          {route.page === 'product' && (
+            <ProductDetailPage product={selectedProduct} onAdd={addToCart} loading={loading} />
+          )}
+          {route.page === 'cart' && (
+            <CartPage
+              cart={cart}
+              onAdd={(id) => updateQuantity(id, 1)}
+              onSubtract={(id) => updateQuantity(id, -1)}
+              onRemove={removeFromCart}
+            />
+          )}
+        </>
       )}
       <ShopFooter />
     </div>
