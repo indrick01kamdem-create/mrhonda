@@ -1,4 +1,9 @@
-const BASE_URL = (import.meta.env?.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+// Backend de production. Sert de repli quand VITE_API_BASE_URL n'est pas
+// défini, pour qu'un déploiement ne dépende pas d'une variable oubliée.
+// En développement, .env.local pointe vers le backend local et l'emporte.
+const DEFAULT_BASE_URL = 'https://generalpolstermoebel-backend-production.up.railway.app';
+
+const BASE_URL = (import.meta.env?.VITE_API_BASE_URL || DEFAULT_BASE_URL).replace(/\/+$/, '');
 
 export class ApiError extends Error {
   constructor(status, detail, body) {
