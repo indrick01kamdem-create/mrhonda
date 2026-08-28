@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, BadgeCheck, CalendarDays, MapPin, MessageCircle, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, BadgeCheck, CalendarDays, MapPin, Menu, MessageCircle, ShieldCheck, X } from 'lucide-react';
 import { WA_NUMBER } from '../../data/shop';
 import { START_DATE, experiences, goals, levels, programs, sources } from '../../data/training';
 
 export function FormationSite({ initialPage = 'home', anchor }) {
   const [page, setPage] = useState(initialPage);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     setPage(initialPage);
+    setMenuOpen(false);
   }, [initialPage]);
 
   useEffect(() => {
@@ -21,31 +23,50 @@ export function FormationSite({ initialPage = 'home', anchor }) {
   const goHome = () => {
     window.location.hash = 'formation';
     setPage('home');
+    setMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const goRegister = () => {
     window.location.hash = 'inscription';
     setPage('register');
+    setMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div className="min-h-screen bg-stone-50 text-neutral-950">
-      <FormationHeader page={page} onHome={goHome} onRegister={goRegister} />
+      <FormationHeader
+        page={page}
+        onHome={goHome}
+        onRegister={goRegister}
+        menuOpen={menuOpen}
+        onToggleMenu={() => setMenuOpen((value) => !value)}
+        onCloseMenu={() => setMenuOpen(false)}
+      />
       {page === 'home' ? <FormationHomePage onRegister={goRegister} /> : <RegisterPage onHome={goHome} />}
       <FormationFooter onRegister={goRegister} />
     </div>
   );
 }
 
-function FormationHeader({ page, onHome, onRegister }) {
+function FormationHeader({ page, onHome, onRegister, menuOpen, onToggleMenu, onCloseMenu }) {
   return (
     <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/90 backdrop-blur-xl">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8">
-        <button onClick={onHome} className="flex items-center" aria-label="Retour à l'accueil">
-          <img src="/asset/logo.png" alt="MR HONDA" className="h-10 w-auto" />
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            className="icon-button md:hidden"
+            onClick={onToggleMenu}
+            aria-label="Menu"
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+          <button onClick={onHome} className="flex items-center" aria-label="Retour à l'accueil">
+            <img src="/asset/logo.png" alt="MR HONDA" className="h-10 w-auto" />
+          </button>
+        </div>
         <nav className="hidden items-center gap-8 text-sm font-semibold text-neutral-600 md:flex">
           <button onClick={onHome} className="hover:text-red-700">
             Accueil
@@ -71,6 +92,41 @@ function FormationHeader({ page, onHome, onRegister }) {
           <span>S'inscrire</span>
         </button>
       </div>
+
+      {menuOpen && (
+        <div className="border-t border-neutral-200 bg-white px-5 py-4 shadow-xl shadow-neutral-200/60 md:hidden">
+          <div className="mx-auto grid max-w-7xl gap-3 text-sm font-black uppercase tracking-[.08em] text-neutral-700">
+            <button onClick={onHome} className="mobile-menu-link">
+              Accueil
+            </button>
+            {page === 'home' && (
+              <>
+                <a href="#filieres" className="mobile-menu-link" onClick={onCloseMenu}>
+                  Filières
+                </a>
+                <a href="#parcours" className="mobile-menu-link" onClick={onCloseMenu}>
+                  Parcours
+                </a>
+                <a href="#diagnostic" className="mobile-menu-link" onClick={onCloseMenu}>
+                  Diagnostic
+                </a>
+              </>
+            )}
+            <a href="#" className="mobile-menu-link" onClick={onCloseMenu}>
+              Boutique
+            </a>
+            <a
+              href={`https://wa.me/${WA_NUMBER}`}
+              target="_blank"
+              rel="noreferrer"
+              className="mobile-menu-link"
+              onClick={onCloseMenu}
+            >
+              WhatsApp
+            </a>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
