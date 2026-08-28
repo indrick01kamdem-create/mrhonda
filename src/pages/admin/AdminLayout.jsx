@@ -26,12 +26,12 @@ export function AdminLayout({ tab, email, onLogout, children }) {
             </button>
           </div>
         </div>
-        <nav className="mx-auto flex max-w-7xl gap-2 px-5 sm:px-8">
+        <nav className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-5 sm:gap-2 sm:px-8">
           {TABS.map((item) => (
             <a
               key={item.id}
               href={`#${item.id}`}
-              className={`border-b-4 px-4 py-3 font-['Archivo'] text-sm font-black uppercase tracking-[.1em] ${
+              className={`shrink-0 whitespace-nowrap border-b-4 px-3 py-3 font-['Archivo'] text-xs font-black uppercase tracking-[.08em] sm:px-4 sm:text-sm sm:tracking-[.1em] ${
                 tab === item.id ? 'border-red-700 text-red-700' : 'border-transparent text-neutral-500 hover:text-neutral-950'
               }`}
             >

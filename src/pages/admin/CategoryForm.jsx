@@ -29,7 +29,7 @@ export function CategoryForm({ category, token, busy, errors, onSubmit, onCancel
   };
 
   return (
-    <form onSubmit={submit} className="border-2 border-neutral-950 bg-white p-6">
+    <form onSubmit={submit} className="border-2 border-neutral-950 bg-white p-4 sm:p-6">
       <h2 className="font-['Archivo'] text-2xl font-black uppercase">
         {category ? 'Modifier la catégorie' : 'Nouvelle catégorie'}
       </h2>

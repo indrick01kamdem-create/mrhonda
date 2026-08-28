@@ -63,11 +63,11 @@ export function OrdersPanel({ request }) {
         <p className="font-semibold text-neutral-500">
           {loading ? 'Chargement…' : `${orders.length} commande${orders.length > 1 ? 's' : ''}`}
         </p>
-        <label className="flex items-center gap-3">
+        <label className="flex w-full items-center gap-3 sm:w-auto">
           <span className="font-['Archivo'] text-xs font-black uppercase tracking-[.14em] text-neutral-500">
             Statut
           </span>
-          <div className="w-44">
+          <div className="w-full sm:w-44">
             <SelectInput value={filter} onChange={(event) => setFilter(event.target.value)}>
               {FILTERS.map((item) => (
                 <option key={item.value} value={item.value}>
@@ -82,8 +82,8 @@ export function OrdersPanel({ request }) {
       <div className="space-y-3">
         {orders.map((order) => (
           <article key={order.id} className="border-2 border-neutral-950 bg-white">
-            <div className="flex flex-wrap items-center justify-between gap-4 p-4">
-              <div className="min-w-0">
+            <div className="flex flex-wrap items-start justify-between gap-4 p-4">
+              <div className="min-w-0 flex-1">
                 <p className="font-['Archivo'] text-xs font-black uppercase tracking-[.14em] text-neutral-500">
                   {order.reference} · {formatDate(order.created_at)}
                 </p>
@@ -95,12 +95,12 @@ export function OrdersPanel({ request }) {
                   <span className="ml-2 font-semibold text-neutral-400">· {order.customer_city}</span>
                 )}
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-4">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[.1em] text-neutral-400">Total articles</p>
                   <strong className="font-['Archivo'] text-xl text-red-700">{formatPrice(order.total)}</strong>
                 </div>
-                <div className="w-40">
+                <div className="w-36 sm:w-40">
                   <SelectInput value={order.status} onChange={(event) => changeStatus(order, event.target.value)}>
                     {STATUSES.map((status) => (
                       <option key={status.value} value={status.value}>

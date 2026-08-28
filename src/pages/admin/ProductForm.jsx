@@ -56,7 +56,7 @@ export function ProductForm({ product, categories, token, busy, errors, onSubmit
   };
 
   return (
-    <form onSubmit={submit} className="border-2 border-neutral-950 bg-white p-6">
+    <form onSubmit={submit} className="border-2 border-neutral-950 bg-white p-4 sm:p-6">
       <h2 className="font-['Archivo'] text-2xl font-black uppercase">
         {product ? 'Modifier le produit' : 'Nouveau produit'}
       </h2>
@@ -106,7 +106,7 @@ export function ProductForm({ product, categories, token, busy, errors, onSubmit
           <TextInput type="number" min="0" max="999" step="1" value={form.position} onChange={set('position')} />
         </Field>
 
-        <label className="flex items-end gap-3 pb-2">
+        <label className="flex items-center gap-3 sm:items-end sm:pb-3">
           <input
             type="checkbox"
             checked={form.visible}
