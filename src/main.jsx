@@ -72,7 +72,7 @@ function App() {
 }
 
 function ShopApp({ route }) {
-  const { loading, error, categories, products, reload } = useCatalog();
+  const { loading, refreshing, error, categories, products, reload } = useCatalog();
   const [cart, setCart] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -140,7 +140,14 @@ function ShopApp({ route }) {
               <CategoryPage slug={route.slug} onAdd={addToCart} products={products} categories={categories} />
             ))}
           {route.page === 'product' && (
-            <ProductDetailPage product={selectedProduct} onAdd={addToCart} loading={loading} />
+            <ProductDetailPage
+              product={selectedProduct}
+              onAdd={addToCart}
+              // Un produit créé depuis le dernier passage n'est pas dans le cache.
+              // Tant que le rafraîchissement tourne, mieux vaut un squelette que
+              // d'annoncer à tort « produit introuvable ».
+              loading={loading || (refreshing && !selectedProduct)}
+            />
           )}
           {route.page === 'cart' && (
             <CartPage
