@@ -1,34 +1,24 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { createCategory, deleteCategory, listCategories, updateCategory } from '../../api/adminApi';
 import { fieldErrors } from '../../api/client';
 import { ActionButton, Banner } from './ui';
 import { CategoryForm } from './CategoryForm';
+import { useCachedList } from './useCachedList';
 
 export function CategoriesPanel({ request, token }) {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState({});
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError('');
-    try {
-      setCategories(await request(listCategories));
-    } catch (failure) {
-      setError(failure.detail || 'Chargement impossible');
-    } finally {
-      setLoading(false);
-    }
-  }, [request]);
-
-  useEffect(() => {
-    load();
-  }, [load]);
+  const fetchCategories = useCallback(() => request(listCategories), [request]);
+  const { data, loading, refreshing, error: loadError, reload } = useCachedList(
+    'categories',
+    fetchCategories,
+  );
+  const categories = data ?? [];
 
   const save = async (payload) => {
     setBusy(true);
@@ -43,7 +33,7 @@ export function CategoriesPanel({ request, token }) {
         setNotice('Catégorie enregistrée.');
       }
       setEditing(null);
-      await load();
+      await reload();
     } catch (failure) {
       setErrors(fieldErrors(failure.body));
       setError(failure.detail || 'Enregistrement impossible');
@@ -58,7 +48,7 @@ export function CategoriesPanel({ request, token }) {
     try {
       await request((t) => deleteCategory(t, category.slug));
       setNotice('Catégorie supprimée.');
-      await load();
+      await reload();
     } catch (failure) {
       setError(failure.detail || 'Suppression impossible');
     }
@@ -88,12 +78,13 @@ export function CategoriesPanel({ request, token }) {
 
   return (
     <>
-      <Banner kind="error" message={error} onClose={() => setError('')} />
+      <Banner kind="error" message={error || loadError} onClose={() => setError('')} />
       <Banner message={notice} onClose={() => setNotice('')} />
 
       <div className="mb-5 flex items-center justify-between gap-4">
         <p className="font-semibold text-neutral-500">
           {categories.length} catégorie{categories.length > 1 ? 's' : ''}
+          {refreshing && <span className="ml-2 text-xs font-black uppercase tracking-[.1em] text-neutral-400">mise à jour…</span>}
         </p>
         <ActionButton onClick={() => setEditing('new')}>
           <Plus className="h-4 w-4" />

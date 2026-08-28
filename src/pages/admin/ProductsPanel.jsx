@@ -1,41 +1,39 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { createProduct, deleteProduct, listCategories, listProducts, updateProduct } from '../../api/adminApi';
 import { fieldErrors } from '../../api/client';
 import { formatPrice } from '../../utils/format';
 import { ActionButton, Banner } from './ui';
 import { ProductForm } from './ProductForm';
+import { useCachedList } from './useCachedList';
 
 export function ProductsPanel({ request, token }) {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState({});
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const [nextProducts, nextCategories] = await Promise.all([
-        request(listProducts),
-        request(listCategories),
-      ]);
-      setProducts(nextProducts);
-      setCategories(nextCategories);
-    } catch (failure) {
-      setError(failure.detail || 'Chargement impossible');
-    } finally {
-      setLoading(false);
-    }
-  }, [request]);
+  const fetchProducts = useCallback(() => request(listProducts), [request]);
+  const fetchCategories = useCallback(() => request(listCategories), [request]);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  // Le cache « categories » est le même que celui de l'onglet Catégories :
+  // une modification faite là-bas se retrouve ici sans recharger.
+  const productsState = useCachedList('products', fetchProducts);
+  const categoriesState = useCachedList('categories', fetchCategories);
+
+  const products = productsState.data ?? [];
+  const categories = categoriesState.data ?? [];
+  const loading = productsState.loading || categoriesState.loading;
+  const refreshing = productsState.refreshing || categoriesState.refreshing;
+  const loadError = productsState.error || categoriesState.error;
+
+  const reloadProducts = productsState.reload;
+  const reloadCategories = categoriesState.reload;
+  const reload = useCallback(
+    () => Promise.all([reloadProducts(), reloadCategories()]),
+    [reloadProducts, reloadCategories],
+  );
 
   const save = async (payload) => {
     setBusy(true);
@@ -50,7 +48,7 @@ export function ProductsPanel({ request, token }) {
         setNotice('Produit enregistré.');
       }
       setEditing(null);
-      await load();
+      await reload();
     } catch (failure) {
       setErrors(fieldErrors(failure.body));
       setError(failure.detail || 'Enregistrement impossible');
@@ -65,7 +63,7 @@ export function ProductsPanel({ request, token }) {
     try {
       await request((t) => deleteProduct(t, product.id));
       setNotice('Produit supprimé.');
-      await load();
+      await reload();
     } catch (failure) {
       setError(failure.detail || 'Suppression impossible');
     }
@@ -96,7 +94,7 @@ export function ProductsPanel({ request, token }) {
 
   return (
     <>
-      <Banner kind="error" message={error} onClose={() => setError('')} />
+      <Banner kind="error" message={error || loadError} onClose={() => setError('')} />
       <Banner message={notice} onClose={() => setNotice('')} />
 
       {categories.length === 0 ? (
@@ -116,6 +114,7 @@ export function ProductsPanel({ request, token }) {
           <div className="mb-5 flex items-center justify-between gap-4">
             <p className="font-semibold text-neutral-500">
               {products.length} produit{products.length > 1 ? 's' : ''}
+              {refreshing && <span className="ml-2 text-xs font-black uppercase tracking-[.1em] text-neutral-400">mise à jour…</span>}
             </p>
             <ActionButton onClick={() => setEditing('new')}>
               <Plus className="h-4 w-4" />

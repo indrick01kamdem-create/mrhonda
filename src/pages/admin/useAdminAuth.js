@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { apiFetch } from '../../api/client';
+import { clearAdminCache } from './adminCache';
 
 const TOKEN_KEY = 'mrhonda_admin_token';
 const EMAIL_KEY = 'mrhonda_admin_email';
@@ -27,6 +28,7 @@ export function useAdminAuth() {
 
   const login = useCallback(async (credentials) => {
     const data = await apiFetch('/api/mrhonda/auth/login', { method: 'POST', body: credentials });
+    clearAdminCache();
     write(TOKEN_KEY, data.token);
     write(EMAIL_KEY, data.email);
     setToken(data.token);
@@ -34,6 +36,9 @@ export function useAdminAuth() {
   }, []);
 
   const logout = useCallback(() => {
+    // Les listes en cache contiennent des données personnelles de clients :
+    // elles disparaissent avec la session, comme le jeton.
+    clearAdminCache();
     write(TOKEN_KEY, null);
     write(EMAIL_KEY, null);
     setToken(null);

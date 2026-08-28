@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { listOrders, updateOrderStatus } from '../../api/adminApi';
 import { formatPrice } from '../../utils/format';
 import { Banner, SelectInput } from './ui';
+import { useCachedList } from './useCachedList';
 
 const STATUSES = [
   { value: 'nouvelle', label: 'Nouvelle' },
@@ -19,49 +20,44 @@ function formatDate(iso) {
 }
 
 export function OrdersPanel({ request }) {
-  const [orders, setOrders] = useState([]);
   const [filter, setFilter] = useState('');
-  const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
-  const [error, setError] = useState('');
+  const [actionError, setActionError] = useState('');
   const [notice, setNotice] = useState('');
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError('');
-    try {
-      setOrders(await request((token) => listOrders(token, filter || undefined)));
-    } catch (failure) {
-      setError(failure.detail || 'Chargement impossible');
-    } finally {
-      setLoading(false);
-    }
-  }, [request, filter]);
-
-  useEffect(() => {
-    load();
-  }, [load]);
+  const fetchOrders = useCallback(
+    () => request((token) => listOrders(token, filter || undefined)),
+    [request, filter],
+  );
+  // Chaque filtre a son propre cache : revenir sur « Toutes » ne doit pas
+  // afficher la liste filtrée précédente.
+  const { data, loading, refreshing, error: loadError, reload } = useCachedList(
+    `orders:${filter || 'all'}`,
+    fetchOrders,
+  );
+  const orders = data ?? [];
 
   const changeStatus = async (order, status) => {
-    setError('');
+    setActionError('');
     try {
       await request((token) => updateOrderStatus(token, order.id, status));
       const label = STATUSES.find((item) => item.value === status)?.label ?? status;
       setNotice(`Commande ${order.reference} : ${label.toLowerCase()}.`);
-      await load();
+      await reload();
     } catch (failure) {
-      setError(failure.detail || 'Changement de statut impossible');
+      setActionError(failure.detail || 'Changement de statut impossible');
     }
   };
 
   return (
     <>
-      <Banner kind="error" message={error} onClose={() => setError('')} />
+      <Banner kind="error" message={actionError || loadError} onClose={() => setActionError('')} />
       <Banner message={notice} onClose={() => setNotice('')} />
 
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
         <p className="font-semibold text-neutral-500">
           {loading ? 'Chargement…' : `${orders.length} commande${orders.length > 1 ? 's' : ''}`}
+          {refreshing && <span className="ml-2 text-xs font-black uppercase tracking-[.1em] text-neutral-400">mise à jour…</span>}
         </p>
         <label className="flex w-full items-center gap-3 sm:w-auto">
           <span className="font-['Archivo'] text-xs font-black uppercase tracking-[.14em] text-neutral-500">
