@@ -35,7 +35,7 @@ export function CategoryForm({ category, token, busy, errors, onSubmit, onCancel
       </h2>
       {category && (
         <p className="mt-2 text-sm font-semibold text-neutral-500">
-          Slug : <code>{category.slug}</code> — non modifiable, il sert aux liens partagés.
+          Slug : <code className="break-all">{category.slug}</code> — non modifiable, il sert aux liens partagés.
         </p>
       )}
 

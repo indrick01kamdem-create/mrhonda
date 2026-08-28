@@ -41,7 +41,7 @@ export function Banner({ kind = 'info', message, onClose }) {
       : 'border-emerald-700 bg-emerald-50 text-emerald-800';
   return (
     <div className={`mb-5 flex items-start justify-between gap-4 border-2 px-4 py-3 font-semibold ${tone}`}>
-      <span>{message}</span>
+      <span className="min-w-0 break-words">{message}</span>
       {onClose && (
         <button onClick={onClose} aria-label="Fermer">
           <X className="h-4 w-4" />

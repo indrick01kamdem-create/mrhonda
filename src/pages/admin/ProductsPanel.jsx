@@ -104,8 +104,11 @@ export function ProductsPanel({ request, token }) {
           <p className="font-semibold text-neutral-600">
             Créez d'abord une catégorie : un produit doit appartenir à une catégorie existante.
           </p>
-          <a href="#categories" className="btn-skew p mt-5 inline-flex">
-            <span>Aller aux catégories</span>
+          <a
+            href="#categories"
+            className="mt-5 inline-flex h-11 items-center justify-center border-2 border-neutral-950 bg-neutral-950 px-5 font-['Archivo'] text-sm font-black uppercase tracking-[.1em] text-white hover:border-red-700 hover:bg-red-700"
+          >
+            Aller aux catégories
           </a>
         </div>
       ) : (

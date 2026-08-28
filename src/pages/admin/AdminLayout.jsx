@@ -8,7 +8,7 @@ const TABS = [
 
 export function AdminLayout({ tab, email, onLogout, children }) {
   return (
-    <div className="min-h-screen bg-[#f9f9f8]">
+    <div className="min-h-screen overflow-x-hidden bg-[#f9f9f8]">
       <header className="border-b-2 border-neutral-950 bg-white">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8">
           <div>

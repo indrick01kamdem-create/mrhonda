@@ -21,7 +21,7 @@ export function AdminLogin({ onLogin }) {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-neutral-950 px-5">
+    <main className="flex min-h-screen items-center justify-center overflow-x-hidden bg-neutral-950 px-5">
       <form onSubmit={submit} className="w-full max-w-sm border-2 border-white bg-white p-7">
         <p className="b-eyebrow">MR HONDA</p>
         <h1 className="mt-2 font-['Archivo'] text-3xl font-black uppercase">Administration</h1>

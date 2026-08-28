@@ -62,7 +62,7 @@ export function ProductForm({ product, categories, token, busy, errors, onSubmit
       </h2>
       {product && (
         <p className="mt-2 text-sm font-semibold text-neutral-500">
-          Identifiant : <code>{product.id}</code> — non modifiable, il sert aux liens partagés.
+          Identifiant : <code className="break-all">{product.id}</code> — non modifiable, il sert aux liens partagés.
         </p>
       )}
 
