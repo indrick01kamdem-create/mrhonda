@@ -1,0 +1,7 @@
+services:
+  mrhonda:
+    build: .
+    container_name: mrhonda
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:4173:4173"
